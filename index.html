@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RecoPoint - Waste Classification</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+        .upload-area {
+            border: 3px dashed #2ecc71;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            border-color: #27ae60;
+            background-color: rgba(46, 204, 113, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <nav class="gradient-bg shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="text-white text-2xl font-bold">
+                    RecoPoint <i class="bi bi-recycle"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
+                    Waste Classification System
+                </h1>
+                
+                <div class="upload-area p-8 rounded-lg text-center mb-6">
+                    <input type="file" id="imageInput" class="hidden" accept="image/*">
+                    <label for="imageInput" class="cursor-pointer">
+                        <div class="space-y-4">
+                            <i class="bi bi-cloud-upload text-5xl text-green-500"></i>
+                            <p class="text-gray-600">Click or drag to upload an image</p>
+                        </div>
+                    </label>
+                </div>
+
+                <div id="imagePreview" class="hidden mb-6">
+                    <img id="preview" class="max-w-full h-auto mx-auto rounded-lg shadow" alt="Preview">
+                </div>
+
+                <div id="result" class="hidden">
+                    <div class="bg-green-100 border-l-4 border-green-500 p-4 rounded">
+                        <div class="flex items-center">
+                            <i class="bi bi-info-circle text-green-500 mr-2"></i>
+                            <p class="text-green-700">
+                                Predicted Class: <span id="prediction" class="font-bold"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-6">
+                    <button onclick="classifyImage()" class="gradient-bg text-white px-6 py-2 rounded-full hover:opacity-90 transition-opacity disabled:opacity-50" id="classifyBtn" disabled>
+                        Classify Image
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">How it works</h2>
+                <div class="space-y-3 text-gray-600">
+                    <p>1. Upload an image of waste material</p>
+                    <p>2. Our AI model will analyze the image</p>
+                    <p>3. Get instant classification results</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="gradient-bg mt-8">
+        <div class="container mx-auto px-6 py-4">
+            <p class="text-center text-white">
+                © 2024 RecoPoint - Waste Classification System
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        let model;
+        const imageInput = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
+        const imagePreview = document.getElementById('imagePreview');
+        const result = document.getElementById('result');
+        const prediction = document.getElementById('prediction');
+        const classifyBtn = document.getElementById('classifyBtn');
+
+        // Load the model when the page loads
+        async function loadModel() {
+            try {
+                // Note: In a real application, you would need to properly host and load your model
+                // This is just a placeholder for demonstration
+                console.log('Model would be loaded here');
+                // model = await tf.loadLayersModel('model.h5');
+            } catch (error) {
+                console.error('Error loading model:', error);
+            }
+        }
+
+        // Handle image upload
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    imagePreview.classList.remove('hidden');
+                    classifyBtn.disabled = false;
+                    result.classList.add('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Classification function
+        async function classifyImage() {
+            try {
+                // This is a placeholder for actual classification logic
+                // In a real application, you would:
+                // 1. Preprocess the image
+                // 2. Make prediction using the model
+                // 3. Process the results
+                
+                const mockClasses = ['Recyclable', 'Organic', 'Hazardous', 'Non-recyclable'];
+                const randomClass = mockClasses[Math.floor(Math.random() * mockClasses.length)];
+                
+                prediction.textContent = randomClass;
+                result.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Error during classification:', error);
+            }
+        }
+
+        // Load model when page loads
+        loadModel();
+
+        // Add drag and drop functionality
+        const uploadArea = document.querySelector('.upload-area');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            uploadArea.classList.add('bg-green-50');
+        }
+
+        function unhighlight(e) {
+            uploadArea.classList.remove('bg-green-50');
+        }
+
+        uploadArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            imageInput.files = files;
+            const event = new Event('change');
+            imageInput.dispatchEvent(event);
+        }
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
